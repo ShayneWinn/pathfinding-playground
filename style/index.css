@@ -1,0 +1,29 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+.side-panel {
+    width:250px;
+    height:100%;
+    bottom:0px;
+    position:absolute;
+
+    background-color: #76829B;
+}
+
+.hex-field {
+    left:250px;
+    bottom:0px;
+    right:0px;
+    top:0px;
+    position:absolute;
+    overflow:hidden;
+
+    background-color: white;
+}
