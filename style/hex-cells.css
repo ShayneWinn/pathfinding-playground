@@ -1,0 +1,12 @@
+.boarder {
+    stroke: #000;
+    stroke-opacity: 1.0;
+    fill: transparent;
+    pointer-events: none;
+}
+
+.hex-cell {
+    stroke: #000;
+    stroke-opacity: 0.2;
+    fill: transparent;
+}
