@@ -4,8 +4,6 @@
 
 /* ====================================
     TODO:
-        Start and End Nodes + Dragging
-        'Start+End' Node
         Side Panel Layout and Buttons
         Side Panel Button State
         Animation
@@ -36,6 +34,8 @@ HexFieldSvg.onmouseup = (e) => test_handler_up(e);
 
 // Globals
 var HexArray;
+var StartHex = null;
+var EndHex = null;
 
 
 //       /=====================\
@@ -138,6 +138,15 @@ function init() {
     }
     console.log(`\tfinished generating ${hexCount} total hex's`);
 
+// Set Start and End Nodes
+    var halfHeight = Math.floor(hexHeight / 2);
+    var quarterWidth = Math.floor(hexWidth / 4);
+    StartHex = HexArray[halfHeight][quarterWidth].coords();
+    document.getElementById(`${StartHex}`).classList.add('hex-start');
+    EndHex = HexArray[halfHeight][hexWidth - quarterWidth].coords();
+    document.getElementById(`${EndHex}`).classList.add('hex-end');
+
+
 // Generate Boarder:
     create_polygon(
         "boarder", "boarder",
@@ -177,13 +186,27 @@ function create_polygon(id, cls, points, x, y, element) {
 
 function test_handler_down(e) {
     let [q, r, s] = e.target.id.split(",").map(Number);
-    if(HexArray[r][q + Math.floor(r/2)].type == types.AIR){
+    let hex = HexArray[r][q + Math.floor(r/2)]
+
+    if([q, r, s].every((val, index) => val === StartHex[index])){
+        if(stateMachine.can('dragStart')){
+            stateMachine.dragStart();
+        }
+    }
+
+    if([q, r, s].every((val, index) => val === EndHex[index])){
+        if(stateMachine.can('dragEnd')){
+            stateMachine.dragEnd();
+        }
+    }
+
+    if(hex.type == types.AIR){
         if(stateMachine.can('drawWall')){
             stateMachine.drawWall();
         }
     }
 
-    if(HexArray[r][q + Math.floor(r/2)].type == types.WALL){
+    if(hex.type == types.WALL){
         if(stateMachine.can('eraseWall')){
             stateMachine.eraseWall();
         }
@@ -192,16 +215,34 @@ function test_handler_down(e) {
 
 function test_handler_drag(e) {
     let [q, r, s] = e.target.id.split(",").map(Number);
+    let hex = HexArray[r][q + Math.floor(r/2)]
+
+    if(stateMachine.is('draggingStart')){
+        if(![q, r, s].every((val, index) => val === StartHex[index])){
+            document.getElementById(`${StartHex}`).classList.remove('hex-start');
+            document.getElementById(`${q},${r},${s}`).classList.add('hex-start');
+            StartHex = [q, r, s]
+        }
+    }
+
+    if(stateMachine.is('draggingEnd')){
+        if(![q, r, s].every((val, index) => val === EndHex[index])){
+            document.getElementById(`${EndHex}`).classList.remove('hex-end');
+            document.getElementById(`${q},${r},${s}`).classList.add('hex-end');
+            EndHex = [q, r, s]
+        }
+    }
+
     if(stateMachine.is('drawingWalls')){
-        if(HexArray[r][q+Math.floor(r/2)].type != types.WALL){
-            HexArray[r][q + Math.floor(r/2)].type = types.WALL;
+        if(hex.type != types.WALL){
+            hex.type = types.WALL;
             document.getElementById(`${q},${r},${s}`).classList.add('hex-wall');
         }
     }
 
     if(stateMachine.is('erasingWalls')){
-        if(HexArray[r][q+Math.floor(r/2)].type != types.AIR){
-            HexArray[r][q + Math.floor(r/2)].type = types.AIR;
+        if(hex.type != types.AIR){
+            hex.type = types.AIR;
             document.getElementById(`${q},${r},${s}`).classList.remove('hex-wall');
         }
     }

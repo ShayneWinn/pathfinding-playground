@@ -14,3 +14,15 @@
 .hex-wall {
     fill: #596275;
 }
+
+.hex-start.hex-end {    
+    fill: url(#startend);
+}
+
+.hex-start {
+    fill: green;
+}
+
+.hex-end {
+    fill: red;
+}

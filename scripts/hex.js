@@ -23,4 +23,8 @@ class Hex {
         this.type = types.AIR;
         this.state = states.UNSEEN;
     }
+
+    coords() {
+        return [this.q, this.r, this.s];
+    }
 };
