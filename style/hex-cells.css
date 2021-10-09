@@ -10,3 +10,7 @@
     stroke-opacity: 0.2;
     fill: transparent;
 }
+
+.hex-wall {
+    fill: #596275;
+}

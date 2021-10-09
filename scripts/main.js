@@ -29,17 +29,10 @@ const HexFieldHeight = HexField.offsetHeight;
 const HexFieldPosition = [HexField.offsetLeft, HexField.offsetTop];
 const SidePanel = document.getElementById("SidePanel");
 
-// Update Elements
-HexFieldSvg.setAttribute("height", `${HexFieldHeight}`);
-HexFieldSvg.setAttribute("width", `${HexFieldWidth}`);
-
 // Set Events
 HexFieldSvg.onmousedown = (e) => test_handler_down(e);
 HexFieldSvg.onmousemove = (e) => test_handler_drag(e);
 HexFieldSvg.onmouseup = (e) => test_handler_up(e);
-
-// Create test polygon
-create_polygon("test", "test", [[15, 15], [20, -15], [-20, -15], [-15, 15], [0, 20]], 40, 40, HexFieldSvg);
 
 // Globals
 var HexArray;
@@ -50,6 +43,7 @@ var HexArray;
 //       >---------------------<
 //      |  VV  STATE MACHINE    |
 //       \=====================/
+
 
 const stateMachine = new StateMachine({
     init: 'none',
@@ -96,17 +90,20 @@ function after_transition(lifecycle) {
 
 function init() {
     console.log("---==/ Initialization started \\==---");
+    HexFieldSvg.setAttribute("height", `${HexFieldHeight}`);
+    HexFieldSvg.setAttribute("width", `${HexFieldWidth}`);
+    console.log("\tset SVG size");
 
 // Generate hexagons:
     // calculate hex size
     const hexSize = Math.max(Math.floor(HexFieldWidth / (50 * Math.sqrt(3))), 15);
-    console.log(`\tHexSize = ${hexSize}`);
+    console.log(`\thexSize = ${hexSize}`);
 
     // calculate how many hexagons fit horizontally and vertically
     const hexWidth = Math.ceil(HexFieldWidth / (Math.sqrt(3) * hexSize));
     const hexHeight = Math.ceil(HexFieldHeight / (0.75 * 2 * hexSize));
 
-    console.log(`\tHexField dimentions = (${hexWidth} hex's wide, ${hexHeight} hex's tall)`);
+    console.log(`\thexField dimentions = (${hexWidth} hex's wide, ${hexHeight} hex's tall)`);
 
     // pre-calculate points
     const w = Math.sqrt(3) * hexSize;
@@ -139,9 +136,9 @@ function init() {
         HexArray[r][q + Math.floor(r/2)] = new Hex(q, r);
       }
     }
-    console.log(`\tFinished generating ${hexCount} hex's`);
+    console.log(`\tfinished generating ${hexCount} total hex's`);
 
-// Generate boarder
+// Generate Boarder:
     create_polygon(
         "boarder", "boarder",
         [[0, 0],[HexFieldWidth, 0],[HexFieldWidth, HexFieldHeight],[0, HexFieldHeight]],
@@ -179,20 +176,35 @@ function create_polygon(id, cls, points, x, y, element) {
 
 
 function test_handler_down(e) {
-    console.log(e.target.id.split(",").map(Number));
-    if(e.target === document.getElementById("test")){
-        if(stateMachine.can('dragStart')){
-            stateMachine.dragStart();
+    let [q, r, s] = e.target.id.split(",").map(Number);
+    if(HexArray[r][q + Math.floor(r/2)].type == types.AIR){
+        if(stateMachine.can('drawWall')){
+            stateMachine.drawWall();
+        }
+    }
+
+    if(HexArray[r][q + Math.floor(r/2)].type == types.WALL){
+        if(stateMachine.can('eraseWall')){
+            stateMachine.eraseWall();
         }
     }
 };
 
 function test_handler_drag(e) {
-    if(stateMachine.is('draggingStart')){
-        document.getElementById("test").setAttribute("transform", `translate(${e.layerX}, ${e.layerY})`);
-    }
     let [q, r, s] = e.target.id.split(",").map(Number);
-    SidePanel.innerHTML = `id = ${[q, r, s]}\n\narray[${r}][${q + Math.floor(r/2)}] = ${HexArray[r][q + Math.floor(r/2)].type}`;
+    if(stateMachine.is('drawingWalls')){
+        if(HexArray[r][q+Math.floor(r/2)].type != types.WALL){
+            HexArray[r][q + Math.floor(r/2)].type = types.WALL;
+            document.getElementById(`${q},${r},${s}`).classList.add('hex-wall');
+        }
+    }
+
+    if(stateMachine.is('erasingWalls')){
+        if(HexArray[r][q+Math.floor(r/2)].type != types.AIR){
+            HexArray[r][q + Math.floor(r/2)].type = types.AIR;
+            document.getElementById(`${q},${r},${s}`).classList.remove('hex-wall');
+        }
+    }
 }
 
 function test_handler_up(e) {
