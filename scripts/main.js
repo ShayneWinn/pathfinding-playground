@@ -2,6 +2,17 @@
 // author: Shayne Winn
 
 
+/* ====================================
+    TODO:
+        Start and End Nodes + Dragging
+        'Start+End' Node
+        Side Panel Layout and Buttons
+        Side Panel Button State
+        Animation
+        Pathfinding
+   ==================================== */
+
+
 //       /=====================\
 //      |  VV  SETUP            |
 //       \=====================/
