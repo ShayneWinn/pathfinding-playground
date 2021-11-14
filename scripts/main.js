@@ -25,7 +25,9 @@ const HexFieldSvg = document.getElementById("HexFieldSvg");
 const HexFieldWidth = HexField.offsetWidth;
 const HexFieldHeight = HexField.offsetHeight;
 const HexFieldPosition = [HexField.offsetLeft, HexField.offsetTop];
+
 const SidePanel = document.getElementById("SidePanel");
+const StateDiv =  document.getElementById("State");
 
 // Set Events
 HexFieldSvg.onmousedown = (e) => test_handler_down(e);
@@ -69,16 +71,34 @@ const stateMachine = new StateMachine({
 
     ],
     methods: {
-        onAfterTransition: (lifecycle) => after_transition(lifecycle),
+        onTransition: (lifecycle) => on_transition(lifecycle),
         onInit: () => init(),
+        onStart: () => on_start(),
+        onFinish: () => on_finish(),
     }
 })
 
-function after_transition(lifecycle) {
+function on_transition(lifecycle) {
     console.log("after_transition", lifecycle);
-    SidePanel.innerHTML = lifecycle.to;
+    StateDiv.innerHTML = lifecycle.to;
 }
 
+
+function on_start(){
+
+}
+
+
+function on_finish(){
+    
+}
+
+
+function StartButtonCallback() {
+    if(stateMachine.can("start")){
+        stateMachine.start();
+    }
+}
 //stateMachine.init();
 
 //       /=====================\
